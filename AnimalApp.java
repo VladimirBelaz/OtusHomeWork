@@ -108,20 +108,17 @@ public class AnimalApp {
             String input = scanner.nextLine().trim();
 
             if (input.isEmpty()) {
-                System.out.println("Ошибка: " + fieldName + " не может быть пустым! Попробуйте снова.");
+                System.out.println("Ошибка: " + fieldName + " не может быть пустым!");
                 continue;
             }
 
-            try {
-                int age = Integer.parseInt(input);
-                if (age < 0) {
-                    System.out.println("Ошибка: " + fieldName + " не может быть отрицательным! Попробуйте снова.");
-                    continue;
-                }
-                return age;
-            } catch (NumberFormatException e) {
-                System.out.println("Ошибка: " + fieldName + " должен быть целым числом! Попробуйте снова.");
+            // Простая проверка - только цифры
+            if (!input.matches("\\d+")) {
+                System.out.println("Ошибка: " + fieldName + " должен быть целым неотрицательным числом!");
+                continue;
             }
+
+            return Integer.parseInt(input);
         }
     }
 }
