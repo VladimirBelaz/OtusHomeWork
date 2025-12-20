@@ -1,0 +1,17 @@
+# Игнорируем для всех проектов
+**/target/
+**/.idea/
+**/*.iml
+**/out/
+**/.gradle/
+**/build/
+**/node_modules/
+
+# Системные файлы
+.DS_Store
+Thumbs.db
+
+# Локальные конфигурации
+**/local.properties
+**/*.env
+**/application-dev.properties
