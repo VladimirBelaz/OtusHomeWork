@@ -1,8 +1,8 @@
 package db.dao;
 
 import db.utils.ConnectionManager;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+
 
 public abstract class AbsTable {
     protected String tableName;

@@ -16,13 +16,13 @@ public class AnimalService {
         return animalTable.findAll();
     }
 
-    public void saveAnimal(String name, String type) {
-        Animal animal = new Animal(name, type);
+    public void saveAnimal(String name, String type, String color, Integer age, Integer weight) {
+        Animal animal = new Animal(name, type, color, age, weight);
         animalTable.save(animal);
     }
 
-    public void updateAnimal(int id, String name, String type) {
-        Animal animal = new Animal(id, name, type);
+    public void updateAnimal(int id, String name, String type, String color, Integer age, Integer weight) {
+        Animal animal = new Animal(id, name, type, color, age, weight);
         animalTable.updateAnimalById(animal);
     }
 
@@ -34,6 +34,14 @@ public class AnimalService {
         return animalTable.findByType(type);
     }
 
+    public List<Animal> findAnimalsByColor(String color) {
+        return animalTable.findByColor(color);
+    }
+
+    public List<Animal> findAnimalsByAgeRange(int minAge, int maxAge) {
+        return animalTable.findByAgeRange(minAge, maxAge);
+    }
+
     public Animal findAnimalById(int id) {
         return animalTable.findById(id);
     }
@@ -43,18 +51,43 @@ public class AnimalService {
         if (animals.isEmpty()) {
             System.out.println("В базе данных нет животных");
         } else {
-            System.out.println("Список всех животных:");
-            animals.forEach(System.out::println);
+            System.out.println("Список всех животных (" + animals.size() + " записей):");
+            System.out.println("==================================================================");
+            System.out.printf("%-5s %-15s %-10s %-15s %-5s %-5s%n",
+                    "ID", "Имя", "Тип", "Цвет", "Возр", "Вес");
+            System.out.println("==================================================================");
+            for (Animal animal : animals) {
+                System.out.printf("%-5d %-15s %-10s %-15s %-5d %-5d%n",
+                        animal.getId(),
+                        animal.getName() != null ? animal.getName() : "-",
+                        animal.getType() != null ? animal.getType() : "-",
+                        animal.getColor() != null ? animal.getColor() : "-",
+                        animal.getAge() != null ? animal.getAge() : 0,
+                        animal.getWeight() != null ? animal.getWeight() : 0);
+            }
+            System.out.println("==================================================================");
         }
     }
 
-    public void printAnimalsByType(String type) {
-        List<Animal> animals = findAnimalsByType(type);
+    public void printAnimals(List<Animal> animals, String title) {
         if (animals.isEmpty()) {
-            System.out.println("Животных типа '" + type + "' не найдено");
+            System.out.println(title + " не найдено");
         } else {
-            System.out.println("Животные типа '" + type + "':");
-            animals.forEach(System.out::println);
+            System.out.println(title + " (" + animals.size() + " записей):");
+            System.out.println("==================================================================");
+            System.out.printf("%-5s %-15s %-10s %-15s %-5s %-5s%n",
+                    "ID", "Имя", "Тип", "Цвет", "Возр", "Вес");
+            System.out.println("==================================================================");
+            for (Animal animal : animals) {
+                System.out.printf("%-5d %-15s %-10s %-15s %-5d %-5d%n",
+                        animal.getId(),
+                        animal.getName() != null ? animal.getName() : "-",
+                        animal.getType() != null ? animal.getType() : "-",
+                        animal.getColor() != null ? animal.getColor() : "-",
+                        animal.getAge() != null ? animal.getAge() : 0,
+                        animal.getWeight() != null ? animal.getWeight() : 0);
+            }
+            System.out.println("==================================================================");
         }
     }
 }

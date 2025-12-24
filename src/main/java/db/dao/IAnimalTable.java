@@ -9,5 +9,7 @@ public interface IAnimalTable {
     void updateAnimalById(Animal animal);
     void deleteById(int id);
     List<Animal> findByType(String type);
+    List<Animal> findByColor(String color);
+    List<Animal> findByAgeRange(int minAge, int maxAge);
     Animal findById(int id);
 }

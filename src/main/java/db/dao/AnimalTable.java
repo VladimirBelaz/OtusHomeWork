@@ -2,8 +2,7 @@ package db.dao;
 
 import db.dto.Animal;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,23 +10,22 @@ public class AnimalTable extends AbsTable implements IAnimalTable {
     public AnimalTable() {
         super("animal");
         columns.put("id", "bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY");
-        columns.put("name", "varchar(50)");
-        columns.put("type", "varchar(50)");
+        columns.put("name", "varchar(15)");
+        columns.put("type", "varchar(10)");
+        columns.put("color", "varchar(20)");
+        columns.put("age", "int");
+        columns.put("weight", "int");
         create();
     }
 
     @Override
     public List<Animal> findAll() {
         List<Animal> animals = new ArrayList<>();
-        String sql = "SELECT * FROM " + tableName;
+        String sql = "SELECT * FROM " + tableName + " ORDER BY id";
 
         try (ResultSet r = connectionManager.executeQuery(sql)) {
             while (r.next()) {
-                animals.add(new Animal(
-                        r.getInt("id"),
-                        r.getString("name"),
-                        r.getString("type")
-                ));
+                animals.add(createAnimalFromResultSet(r));
             }
         } catch (SQLException e) {
             System.err.println("Ошибка при получении всех животных: " + e.getMessage());
@@ -39,8 +37,13 @@ public class AnimalTable extends AbsTable implements IAnimalTable {
     @Override
     public void save(Animal animal) {
         String sql = String.format(
-                "INSERT INTO %s (name, type) VALUES ('%s', '%s')",
-                tableName, animal.getName(), animal.getType()
+                "INSERT INTO %s (name, type, color, age, weight) VALUES ('%s', '%s', '%s', %s, %s)",
+                tableName,
+                animal.getName(),
+                animal.getType(),
+                animal.getColor(),
+                animal.getAge() != null ? animal.getAge().toString() : "NULL",
+                animal.getWeight() != null ? animal.getWeight().toString() : "NULL"
         );
 
         try {
@@ -55,8 +58,14 @@ public class AnimalTable extends AbsTable implements IAnimalTable {
     @Override
     public void updateAnimalById(Animal animal) {
         String sql = String.format(
-                "UPDATE %s SET name = '%s', type = '%s' WHERE id = %d",
-                tableName, animal.getName(), animal.getType(), animal.getId()
+                "UPDATE %s SET name = '%s', type = '%s', color = '%s', age = %s, weight = %s WHERE id = %d",
+                tableName,
+                animal.getName(),
+                animal.getType(),
+                animal.getColor(),
+                animal.getAge() != null ? animal.getAge().toString() : "NULL",
+                animal.getWeight() != null ? animal.getWeight().toString() : "NULL",
+                animal.getId()
         );
 
         try {
@@ -93,20 +102,54 @@ public class AnimalTable extends AbsTable implements IAnimalTable {
     public List<Animal> findByType(String type) {
         List<Animal> animals = new ArrayList<>();
         String sql = String.format(
-                "SELECT * FROM %s WHERE LOWER(type) LIKE LOWER('%%%s%%')",
+                "SELECT * FROM %s WHERE LOWER(type) LIKE LOWER('%%%s%%') ORDER BY id",
                 tableName, type
         );
 
         try (ResultSet r = connectionManager.executeQuery(sql)) {
             while (r.next()) {
-                animals.add(new Animal(
-                        r.getInt("id"),
-                        r.getString("name"),
-                        r.getString("type")
-                ));
+                animals.add(createAnimalFromResultSet(r));
             }
         } catch (SQLException e) {
             System.err.println("Ошибка при поиске по типу: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return animals;
+    }
+
+    @Override
+    public List<Animal> findByColor(String color) {
+        List<Animal> animals = new ArrayList<>();
+        String sql = String.format(
+                "SELECT * FROM %s WHERE LOWER(color) LIKE LOWER('%%%s%%') ORDER BY id",
+                tableName, color
+        );
+
+        try (ResultSet r = connectionManager.executeQuery(sql)) {
+            while (r.next()) {
+                animals.add(createAnimalFromResultSet(r));
+            }
+        } catch (SQLException e) {
+            System.err.println("Ошибка при поиске по цвету: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return animals;
+    }
+
+    @Override
+    public List<Animal> findByAgeRange(int minAge, int maxAge) {
+        List<Animal> animals = new ArrayList<>();
+        String sql = String.format(
+                "SELECT * FROM %s WHERE age BETWEEN %d AND %d ORDER BY age",
+                tableName, minAge, maxAge
+        );
+
+        try (ResultSet r = connectionManager.executeQuery(sql)) {
+            while (r.next()) {
+                animals.add(createAnimalFromResultSet(r));
+            }
+        } catch (SQLException e) {
+            System.err.println("Ошибка при поиске по возрасту: " + e.getMessage());
             e.printStackTrace();
         }
         return animals;
@@ -118,16 +161,24 @@ public class AnimalTable extends AbsTable implements IAnimalTable {
 
         try (ResultSet r = connectionManager.executeQuery(sql)) {
             if (r.next()) {
-                return new Animal(
-                        r.getInt("id"),
-                        r.getString("name"),
-                        r.getString("type")
-                );
+                return createAnimalFromResultSet(r);
             }
         } catch (SQLException e) {
             System.err.println("Ошибка при поиске по ID: " + e.getMessage());
             e.printStackTrace();
         }
         return null;
+    }
+
+    // Вспомогательный метод для создания объекта Animal из ResultSet
+    private Animal createAnimalFromResultSet(ResultSet r) throws SQLException {
+        return new Animal(
+                r.getInt("id"),
+                r.getString("name"),
+                r.getString("type"),
+                r.getString("color"),
+                r.getInt("age"),
+                r.getInt("weight")
+        );
     }
 }
