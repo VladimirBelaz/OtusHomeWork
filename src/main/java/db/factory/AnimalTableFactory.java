@@ -1,12 +1,12 @@
 package db.factory;
 
-import db.dao.AnimalTable;
+import db.dao.AnimalsTable;
 import db.dao.IAnimalTable;
 import db.dao.mock.MockAnimalTable;
 
 public class AnimalTableFactory {
     public IAnimalTable getProd() {
-        return new AnimalTable();
+        return new AnimalsTable();
     }
 
     public IAnimalTable getMock() {

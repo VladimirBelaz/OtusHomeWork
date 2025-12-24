@@ -7,8 +7,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AnimalTable extends AbsTable implements IAnimalTable {
-    public AnimalTable() {
+public class AnimalsTable extends AbsTable implements IAnimalTable {
+    public AnimalsTable() {
         super("animal");
         columns.put("id", "bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY");
         columns.put("name", "varchar(50)");
