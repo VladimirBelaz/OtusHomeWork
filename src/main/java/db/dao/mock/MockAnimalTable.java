@@ -42,14 +42,15 @@ public class MockAnimalTable implements IAnimalTable {
     }
 
     @Override
-    public void deleteById(int id) {
+    public boolean deleteById(int id) {
         for (int i = 0; i < animals.size(); i++) {
             if (animals.get(i).getId() == id) {
                 animals.remove(i);
                 System.out.println("Mock: Животное удалено - ID=" + id);
-                return;
+                return true;
             }
         }
+        return false;
     }
 
     @Override
@@ -59,31 +60,6 @@ public class MockAnimalTable implements IAnimalTable {
 
         for (Animal animal : animals) {
             if (animal.getType().toLowerCase().contains(searchType)) {
-                result.add(animal);
-            }
-        }
-        return result;
-    }
-
-    @Override
-    public List<Animal> findByColor(String color) {
-        List<Animal> result = new ArrayList<>();
-        String searchColor = color.toLowerCase();
-
-        for (Animal animal : animals) {
-            if (animal.getColor().toLowerCase().contains(searchColor)) {
-                result.add(animal);
-            }
-        }
-        return result;
-    }
-
-    @Override
-    public List<Animal> findByAgeRange(int minAge, int maxAge) {
-        List<Animal> result = new ArrayList<>();
-
-        for (Animal animal : animals) {
-            if (animal.getAge() != null && animal.getAge() >= minAge && animal.getAge() <= maxAge) {
                 result.add(animal);
             }
         }

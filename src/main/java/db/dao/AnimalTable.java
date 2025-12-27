@@ -10,9 +10,9 @@ public class AnimalTable extends AbsTable implements IAnimalTable {
     public AnimalTable() {
         super("animal");
         columns.put("id", "bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY");
-        columns.put("name", "varchar(15)");
-        columns.put("type", "varchar(10)");
-        columns.put("color", "varchar(20)");
+        columns.put("name", "varchar(100)");
+        columns.put("type", "varchar(100)");
+        columns.put("color", "varchar(100)");
         columns.put("age", "int");
         columns.put("weight", "int");
         create();
@@ -20,165 +20,92 @@ public class AnimalTable extends AbsTable implements IAnimalTable {
 
     @Override
     public List<Animal> findAll() {
-        List<Animal> animals = new ArrayList<>();
-        String sql = "SELECT * FROM " + tableName + " ORDER BY id";
-
-        try (ResultSet r = connectionManager.executeQuery(sql)) {
-            while (r.next()) {
-                animals.add(createAnimalFromResultSet(r));
-            }
-        } catch (SQLException e) {
-            System.err.println("Ошибка при получении всех животных: " + e.getMessage());
-            e.printStackTrace();
-        }
-        return animals;
+        return executeQuery("SELECT * FROM " + tableName + " ORDER BY id");
     }
 
     @Override
     public void save(Animal animal) {
-        String sql = String.format(
-                "INSERT INTO %s (name, type, color, age, weight) VALUES ('%s', '%s', '%s', %s, %s)",
-                tableName,
-                animal.getName(),
-                animal.getType(),
-                animal.getColor(),
-                animal.getAge() != null ? animal.getAge().toString() : "NULL",
-                animal.getWeight() != null ? animal.getWeight().toString() : "NULL"
-        );
-
-        try {
-            connectionManager.executeUpdate(sql);
-            System.out.println("Животное сохранено: " + animal.getName());
-        } catch (Exception e) {
-            System.err.println("Ошибка при сохранении животного: " + e.getMessage());
-            e.printStackTrace();
-        }
+        executeUpdate(String.format(
+                "INSERT INTO %s (name, type, color, age, weight) " +
+                        "VALUES ('%s', '%s', '%s', %d, %d)",
+                tableName, animal.getName(), animal.getType(), animal.getColor(),
+                animal.getAge(), animal.getWeight()
+        ));
     }
 
     @Override
     public void updateAnimalById(Animal animal) {
-        String sql = String.format(
-                "UPDATE %s SET name = '%s', type = '%s', color = '%s', age = %s, weight = %s WHERE id = %d",
-                tableName,
-                animal.getName(),
-                animal.getType(),
-                animal.getColor(),
-                animal.getAge() != null ? animal.getAge().toString() : "NULL",
-                animal.getWeight() != null ? animal.getWeight().toString() : "NULL",
-                animal.getId()
-        );
-
-        try {
-            int rowsAffected = connectionManager.executeUpdate(sql);
-            if (rowsAffected > 0) {
-                System.out.println("Животное с ID=" + animal.getId() + " обновлено");
-            } else {
-                System.out.println("Животное с ID=" + animal.getId() + " не найдено");
-            }
-        } catch (Exception e) {
-            System.err.println("Ошибка при обновлении животного: " + e.getMessage());
-            e.printStackTrace();
-        }
+        executeUpdate(String.format(
+                "UPDATE %s " +
+                        "SET name='%s', type='%s', color='%s', age=%d, weight=%d " +
+                        "WHERE id=%d",
+                tableName, animal.getName(), animal.getType(), animal.getColor(),
+                animal.getAge(), animal.getWeight(), animal.getId()
+        ));
     }
 
     @Override
-    public void deleteById(int id) {
+    public boolean deleteById(int id) {
         String sql = String.format("DELETE FROM %s WHERE id = %d", tableName, id);
 
         try {
             int rowsAffected = connectionManager.executeUpdate(sql);
-            if (rowsAffected > 0) {
-                System.out.println("Животное с ID=" + id + " удалено");
-            } else {
-                System.out.println("Животное с ID=" + id + " не найдено");
-            }
+            return rowsAffected > 0;  // возвращаем true, если удалили хотя бы одну строку
         } catch (Exception e) {
             System.err.println("Ошибка при удалении животного: " + e.getMessage());
-            e.printStackTrace();
+            return false;
         }
     }
 
     @Override
     public List<Animal> findByType(String type) {
-        List<Animal> animals = new ArrayList<>();
-        String sql = String.format(
-                "SELECT * FROM %s WHERE LOWER(type) LIKE LOWER('%%%s%%') ORDER BY id",
-                tableName, type
+        return executeQuery(
+                "SELECT * " +
+                        "FROM " + tableName +
+                        " WHERE LOWER(type) " +
+                        "LIKE LOWER('%" + type + "%') " +
+                        "ORDER BY id"
         );
-
-        try (ResultSet r = connectionManager.executeQuery(sql)) {
-            while (r.next()) {
-                animals.add(createAnimalFromResultSet(r));
-            }
-        } catch (SQLException e) {
-            System.err.println("Ошибка при поиске по типу: " + e.getMessage());
-            e.printStackTrace();
-        }
-        return animals;
-    }
-
-    @Override
-    public List<Animal> findByColor(String color) {
-        List<Animal> animals = new ArrayList<>();
-        String sql = String.format(
-                "SELECT * FROM %s WHERE LOWER(color) LIKE LOWER('%%%s%%') ORDER BY id",
-                tableName, color
-        );
-
-        try (ResultSet r = connectionManager.executeQuery(sql)) {
-            while (r.next()) {
-                animals.add(createAnimalFromResultSet(r));
-            }
-        } catch (SQLException e) {
-            System.err.println("Ошибка при поиске по цвету: " + e.getMessage());
-            e.printStackTrace();
-        }
-        return animals;
-    }
-
-    @Override
-    public List<Animal> findByAgeRange(int minAge, int maxAge) {
-        List<Animal> animals = new ArrayList<>();
-        String sql = String.format(
-                "SELECT * FROM %s WHERE age BETWEEN %d AND %d ORDER BY age",
-                tableName, minAge, maxAge
-        );
-
-        try (ResultSet r = connectionManager.executeQuery(sql)) {
-            while (r.next()) {
-                animals.add(createAnimalFromResultSet(r));
-            }
-        } catch (SQLException e) {
-            System.err.println("Ошибка при поиске по возрасту: " + e.getMessage());
-            e.printStackTrace();
-        }
-        return animals;
     }
 
     @Override
     public Animal findById(int id) {
-        String sql = String.format("SELECT * FROM %s WHERE id = %d", tableName, id);
-
-        try (ResultSet r = connectionManager.executeQuery(sql)) {
-            if (r.next()) {
-                return createAnimalFromResultSet(r);
-            }
-        } catch (SQLException e) {
-            System.err.println("Ошибка при поиске по ID: " + e.getMessage());
-            e.printStackTrace();
-        }
-        return null;
+        List<Animal> animals = executeQuery(
+                String.format("SELECT * " +
+                        "FROM %s " +
+                        "WHERE id = %d", tableName, id)
+        );
+        return animals.isEmpty() ? null : animals.get(0);
     }
 
-    // Вспомогательный метод для создания объекта Animal из ResultSet
-    private Animal createAnimalFromResultSet(ResultSet r) throws SQLException {
-        return new Animal(
-                r.getInt("id"),
-                r.getString("name"),
-                r.getString("type"),
-                r.getString("color"),
-                r.getInt("age"),
-                r.getInt("weight")
-        );
+    private List<Animal> executeQuery(String sql) {
+        List<Animal> animals = new ArrayList<>();
+        try (ResultSet rs = connectionManager.executeQuery(sql)) {
+            while (rs.next()) {
+                try {
+                    animals.add(new Animal(
+                            rs.getInt("id"),
+                            rs.getString("name"),
+                            rs.getString("type"),
+                            rs.getString("color"),
+                            rs.getInt("age"),
+                            rs.getInt("weight")
+                    ));
+                } catch (SQLException e) {
+
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Ошибка запроса: " + e.getMessage());
+        }
+        return animals;
+    }
+
+    private void executeUpdate(String sql) {
+        try {
+            connectionManager.executeUpdate(sql);
+        } catch (Exception e) {
+            System.err.println("Ошибка выполнения: " + e.getMessage());
+        }
     }
 }

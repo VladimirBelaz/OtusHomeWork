@@ -16,30 +16,25 @@ public class AnimalService {
         return animalTable.findAll();
     }
 
-    public void saveAnimal(String name, String type, String color, Integer age, Integer weight) {
-        Animal animal = new Animal(name, type, color, age, weight);
+    // Метод принимает объект Animal для сохранения
+    public void saveAnimal(Animal animal) {
         animalTable.save(animal);
+        System.out.println("✓ Животное сохранено: " + animal.getName());
     }
 
-    public void updateAnimal(int id, String name, String type, String color, Integer age, Integer weight) {
-        Animal animal = new Animal(id, name, type, color, age, weight);
+    // Метод принимает объект Animal для обновления (должен содержать ID)
+    public void updateAnimal(Animal animal) {
         animalTable.updateAnimalById(animal);
+        System.out.println("✓ Животное обновлено: ID=" + animal.getId());
     }
 
     public void deleteAnimal(int id) {
         animalTable.deleteById(id);
+        System.out.println("✓ Удаление животного с ID=" + id + " выполнено");
     }
 
     public List<Animal> findAnimalsByType(String type) {
         return animalTable.findByType(type);
-    }
-
-    public List<Animal> findAnimalsByColor(String color) {
-        return animalTable.findByColor(color);
-    }
-
-    public List<Animal> findAnimalsByAgeRange(int minAge, int maxAge) {
-        return animalTable.findByAgeRange(minAge, maxAge);
     }
 
     public Animal findAnimalById(int id) {
@@ -49,45 +44,23 @@ public class AnimalService {
     public void printAllAnimals() {
         List<Animal> animals = findAll();
         if (animals.isEmpty()) {
-            System.out.println("В базе данных нет животных");
-        } else {
-            System.out.println("Список всех животных (" + animals.size() + " записей):");
-            System.out.println("==================================================================");
-            System.out.printf("%-5s %-15s %-10s %-15s %-5s %-5s%n",
-                    "ID", "Имя", "Тип", "Цвет", "Возр", "Вес");
-            System.out.println("==================================================================");
-            for (Animal animal : animals) {
-                System.out.printf("%-5d %-15s %-10s %-15s %-5d %-5d%n",
-                        animal.getId(),
-                        animal.getName() != null ? animal.getName() : "-",
-                        animal.getType() != null ? animal.getType() : "-",
-                        animal.getColor() != null ? animal.getColor() : "-",
-                        animal.getAge() != null ? animal.getAge() : 0,
-                        animal.getWeight() != null ? animal.getWeight() : 0);
-            }
-            System.out.println("==================================================================");
+            System.out.println("Нет животных");
+            return;
+        }
+        System.out.println("Все животные (" + animals.size() + "):");
+        for (Animal animal : animals) {
+            System.out.println(animal);
         }
     }
 
     public void printAnimals(List<Animal> animals, String title) {
-        if (animals.isEmpty()) {
+        if (animals == null || animals.isEmpty()) {
             System.out.println(title + " не найдено");
         } else {
-            System.out.println(title + " (" + animals.size() + " записей):");
-            System.out.println("==================================================================");
-            System.out.printf("%-5s %-15s %-10s %-15s %-5s %-5s%n",
-                    "ID", "Имя", "Тип", "Цвет", "Возр", "Вес");
-            System.out.println("==================================================================");
+            System.out.println("\n" + title + " (" + animals.size() + " животных):");
             for (Animal animal : animals) {
-                System.out.printf("%-5d %-15s %-10s %-15s %-5d %-5d%n",
-                        animal.getId(),
-                        animal.getName() != null ? animal.getName() : "-",
-                        animal.getType() != null ? animal.getType() : "-",
-                        animal.getColor() != null ? animal.getColor() : "-",
-                        animal.getAge() != null ? animal.getAge() : 0,
-                        animal.getWeight() != null ? animal.getWeight() : 0);
+                System.out.println(animal);
             }
-            System.out.println("==================================================================");
         }
     }
 }

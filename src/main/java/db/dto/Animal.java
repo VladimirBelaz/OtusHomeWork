@@ -5,11 +5,10 @@ public class Animal {
     private String name;
     private String type;
     private String color;
-    private Integer age;
-    private Integer weight;
+    private int age;
+    private int weight;
 
-    // Конструктор для создания нового животного (без ID)
-    public Animal(String name, String type, String color, Integer age, Integer weight) {
+    public Animal(String name, String type, String color, int age, int weight) {
         this.name = name;
         this.type = type;
         this.color = color;
@@ -17,8 +16,7 @@ public class Animal {
         this.weight = weight;
     }
 
-    // Конструктор для загрузки из БД (с ID)
-    public Animal(int id, String name, String type, String color, Integer age, Integer weight) {
+    public Animal(int id, String name, String type, String color, int age, int weight) {
         this.id = id;
         this.name = name;
         this.type = type;
@@ -27,58 +25,45 @@ public class Animal {
         this.weight = weight;
     }
 
-    @Override
-    public String toString() {
-        return String.format("Animal{id=%d, name='%s', type='%s', color='%s', age=%d, weight=%d}",
-                id, name, type, color, age, weight);
+    public int getId() { return id; }
+    public String getName() {
+        return name;
     }
-
-    // Геттеры и сеттеры
-    public int getId() {
-        return id;
+    public String getType() {
+        return type;
+    }
+    public String getColor() {
+        return color;
+    }
+    public int getAge() {
+        return age;
+    }
+    public int getWeight() {
+        return weight;
     }
 
     public void setId(int id) {
         this.id = id;
     }
-
-    public String getName() {
-        return name;
-    }
-
     public void setName(String name) {
         this.name = name;
     }
-
-    public String getType() {
-        return type;
-    }
-
     public void setType(String type) {
         this.type = type;
     }
-
-    public String getColor() {
-        return color;
-    }
-
     public void setColor(String color) {
         this.color = color;
     }
-
-    public Integer getAge() {
-        return age;
-    }
-
-    public void setAge(Integer age) {
+    public void setAge(int age) {
         this.age = age;
     }
-
-    public Integer getWeight() {
-        return weight;
+    public void setWeight(int weight) {
+        this.weight = weight;
     }
 
-    public void setWeight(Integer weight) {
-        this.weight = weight;
+    @Override
+    public String toString() {
+        return String.format("ID: %d, Имя: %s, Тип: %s, Цвет: %s, Возраст: %d, Вес: %d",
+                id, name, type, color, age, weight);
     }
 }

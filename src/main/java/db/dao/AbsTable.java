@@ -15,19 +15,16 @@ public abstract class AbsTable {
     }
 
     public void create() {
-        StringBuilder sqlBuilder = new StringBuilder("CREATE TABLE IF NOT EXISTS ");
-        sqlBuilder.append(tableName).append(" (");
-
+        List<String> columnDefinitions = new ArrayList<>();
         for (Map.Entry<String, String> entry : columns.entrySet()) {
-            sqlBuilder.append(entry.getKey()).append(" ").append(entry.getValue()).append(", ");
+            columnDefinitions.add(entry.getKey() + " " + entry.getValue());
         }
 
-        // Удаляем последнюю запятую и пробел
-        sqlBuilder.setLength(sqlBuilder.length() - 2);
-        sqlBuilder.append(")");
+        String columnsString = String.join(", ", columnDefinitions);
+        String sql = String.format("CREATE TABLE IF NOT EXISTS %s (%s)", tableName, columnsString);
 
-        String sql = sqlBuilder.toString();
-        System.out.println("Создание таблицы: " + sql);
-        connectionManager.executeUpdate(sql);
+        if(connectionManager.executeUpdate(sql) > 0) {
+            System.out.println("Создание таблицы: " + sql);
+        }
     }
 }
