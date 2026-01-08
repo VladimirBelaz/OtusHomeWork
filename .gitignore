@@ -1,13 +1,11 @@
+# Build outputs
 target/
-!.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+build/
+out/
 
-### IntelliJ IDEA ###
-.idea/modules.xml
-.idea/jarRepositories.xml
-.idea/compiler.xml
-.idea/libraries/
-*.iws
+# IDE
+.idea/
 *.iml
-*.ipr
+
+# System
+.DS_Store
